@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraping Results</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <h1>Web Scraping Results</h1>
+    <form id="scrapeForm">
+        <label for="url">Ingresa un enlace:</label>
+        <input type="text" id="url" name="url">
+        <button type="submit">Scrapear</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('scrapeForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const url = document.getElementById('url').value;
+            const response = await fetch('/scrape', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `url=${encodeURIComponent(url)}`,
+            });
+            const data = await response.json();
+            const results = document.getElementById('results');
+            results.innerHTML = '';
+            if (data.error) {
+                results.textContent = data.error;
+            } else {
+                const paragraphs = data.text.split('\n');
+                paragraphs.forEach(paragraph => {
+                    const p = document.createElement('p');
+                    p.textContent = paragraph;
+                    results.appendChild(p);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
